@@ -116,7 +116,7 @@ This project involves:
 ## 📊 Example Dashboard (Grafana)  
 
 <p align="center">
-  <img src="https://grafana.com/static/img/docs/enterprise/grafana-cloud-metrics-overview.png" alt="Grafana Dashboard Example" style="width:88%;max-width:1000px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.18)"/>
+  <img src="./grafanalogo.png" alt="Grafana Dashboard Example" style="width:88%;max-width:1000px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.18)"/>
 </p>
 
 ---
