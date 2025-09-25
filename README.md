@@ -1,5 +1,7 @@
 # 🚀 Monitoring a Containerized URL Shortener Webservice  
 
+![DevOps Lifecycle](./devops.png)
+
 ![Docker](https://img.shields.io/badge/Docker-Containerization-blue) 
 ![Prometheus](https://img.shields.io/badge/Monitoring-Prometheus-orange) 
 ![Grafana](https://img.shields.io/badge/Dashboard-Grafana-yellow) 
