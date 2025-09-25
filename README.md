@@ -1,11 +1,15 @@
 # 🚀 Monitoring a Containerized URL Shortener Webservice  
 
-![DevOps Lifecycle](./devops.png)
+<p align="center">
+  <img src="./devops.png" alt="DevOps Lifecycle" style="width:85%;max-width:1100px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.25)"/>
+</p>
 
-![Docker](https://img.shields.io/badge/Docker-Containerization-blue) 
-![Prometheus](https://img.shields.io/badge/Monitoring-Prometheus-orange) 
-![Grafana](https://img.shields.io/badge/Dashboard-Grafana-yellow) 
-![Database](https://img.shields.io/badge/Database-SQLite-lightgrey)  
+<p align="center">
+  <img src="https://img.shields.io/badge/Docker-Containerization-blue" alt="Docker"/>
+  <img src="https://img.shields.io/badge/Monitoring-Prometheus-orange" alt="Prometheus"/>
+  <img src="https://img.shields.io/badge/Dashboard-Grafana-yellow" alt="Grafana"/>
+  <img src="https://img.shields.io/badge/Database-SQLite-lightgrey" alt="SQLite"/>
+</p>
 
 ---
 
@@ -110,7 +114,10 @@ This project involves:
 ---
 
 ## 📊 Example Dashboard (Grafana)  
-![Grafana Dashboard Example](https://grafana.com/static/img/docs/enterprise/grafana-cloud-metrics-overview.png)  
+
+<p align="center">
+  <img src="https://grafana.com/static/img/docs/enterprise/grafana-cloud-metrics-overview.png" alt="Grafana Dashboard Example" style="width:88%;max-width:1000px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.18)"/>
+</p>
 
 ---
 
