@@ -129,6 +129,7 @@ cd project-directory
 
 # Build & start services
 docker-compose up --build
+```
 
 ---
 
