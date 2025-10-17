@@ -1,4 +1,4 @@
-# 🚀 Monitoring a Containerized URL Shortener Webservice  
+# 🚀 DevOps Pipeline for a Scalable Microservices Chat System
 
 <p align="center">
   <img src="./devops.png" alt="DevOps Lifecycle" style="width:85%;max-width:1100px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.25)"/>
