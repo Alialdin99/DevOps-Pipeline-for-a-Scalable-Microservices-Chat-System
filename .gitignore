@@ -1,0 +1,67 @@
+ 
+# ------------------------
+# .NET Core build files
+# ------------------------
+bin/
+obj/
+out/
+*.dll
+*.exe
+*.pdb
+*.db
+*.cache
+*.log
+
+# ------------------------
+# User-specific files
+# ------------------------
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ------------------------
+# IDE files
+# ------------------------
+.vs/
+.vscode/
+.idea/
+
+# ------------------------
+# Environment files
+# ------------------------
+.env
+*.env
+.env.*
+
+# ------------------------
+# Configuration and secrets
+# ------------------------
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.json
+secrets.json
+
+# ------------------------
+# Docker
+# ------------------------
+docker-compose.override.yml
+*.pid
+*.seed
+*.tar
+*.gz
+
+# ------------------------
+# OS generated files
+# ------------------------
+Thumbs.db
+.DS_Store
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# ------------------------
+# Others
+# ------------------------
+node_modules/
+wwwroot/lib/
