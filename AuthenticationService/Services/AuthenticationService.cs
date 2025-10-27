@@ -1,6 +1,5 @@
 ﻿using AuthenticationService.Models;
 using AuthenticationService.Repositories;
-using AuthenticationService.Messaging.Events;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 
@@ -9,6 +8,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Shared.Contracts.Events;
 namespace AuthenticationService.Services
 {
     public class AuthService
