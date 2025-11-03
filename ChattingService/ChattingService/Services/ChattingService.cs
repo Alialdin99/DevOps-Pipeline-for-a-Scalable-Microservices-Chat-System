@@ -1,9 +1,8 @@
-﻿using ChattingService.Event;
+﻿using Shared.Events;
 using ChattingService.Models;
 using ChattingService.Repositories;
 using MassTransit;
-using Microsoft.VisualBasic;
-using System.Threading.Tasks;
+
 
 
 namespace ChattingService.Services
