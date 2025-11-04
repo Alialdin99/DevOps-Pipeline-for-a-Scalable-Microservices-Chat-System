@@ -34,7 +34,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<UserDeletedConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host("localhost", 59048, "/", h =>
+        cfg.Host("localhost", 56988, "/", h =>
         {
             h.Username("guest");
             h.Password("guest");
@@ -47,6 +47,16 @@ builder.Services.AddMassTransit(x =>
         {
             e.ConfigureConsumer<UserDeletedConsumer>(context);
         });
+    });
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
@@ -77,5 +87,6 @@ if (app.Environment.IsDevelopment())
 }
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("AllowAll");
 app.MapControllers();
 app.Run();

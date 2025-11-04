@@ -25,31 +25,39 @@ namespace AuthenticationService.Services
            _config = config;
         }
 
-        public async Task<string> RegisterAsync(string username,string email, string password)
+        public async Task<string> RegisterAsync(string username, string email, string password)
         {
             var existing = await _userRepository.GetByEmailAsync(email);
             if (existing != null)
-                throw new Exception("Userl Already exists");
+                throw new InvalidOperationException("User already exists.");
 
-            var user = new User
+            try
             {
-                Username = username,
-                Email = email,
-                PasswordHash = HashPassword(password)
-            };
+                var user = new User
+                {
+                    Username = username,
+                    Email = email,
+                    PasswordHash = HashPassword(password)
+                };
 
-            await _userRepository.CreateAsync(user);
+                await _userRepository.CreateAsync(user);
 
-            // Publish "UserRegistered" event to RabbitMQ
-            await _publishEndpoint.Publish(new UserRegistered
+                await _publishEndpoint.Publish(new UserRegistered
+                {
+                    UserId = user.Id,
+                    Email = user.Email,
+                    Username = user.Username,
+                    CreatedAt = user.CreatedAt
+                });
+
+                return GenerateJwtToken(user);
+            }
+            catch (Exception ex)
             {
-                UserId = user.Id,
-                Email = user.Email,
-                Username = user.Username,
-                CreatedAt = user.CreatedAt
-            });
-            return GenerateJwtToken(user);
+                throw new Exception("Failed to register user. Please try again later.");
+            }
         }
+
         public async Task<string> LoginAsync(string email, string password)
         {
             var user = await _userRepository.GetByEmailAsync(email);
