@@ -20,7 +20,7 @@ builder.Services.AddSingleton<IMongoDatabase>(sp =>
 });
 
 
-builder.Services.AddSingleton<ChatRepository>();
+builder.Services.AddScoped<ChatRepository>();
 builder.Services.AddScoped<ChatService>();
 
 //SignalR setup

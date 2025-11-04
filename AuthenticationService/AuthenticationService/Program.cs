@@ -34,7 +34,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<UserDeletedConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host("localhost", 56988, "/", h =>
+        cfg.Host("localhost", 5672, "/", h =>
         {
             h.Username("guest");
             h.Password("guest");

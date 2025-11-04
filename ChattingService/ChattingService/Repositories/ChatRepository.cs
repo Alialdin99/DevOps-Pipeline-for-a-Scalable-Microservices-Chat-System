@@ -14,6 +14,7 @@ namespace ChattingService.Repositories
         public ChatRepository(IMongoDatabase db)
         {
             _messages = db.GetCollection<Message>("Messages");
+            _conversations = db.GetCollection<Conversation>("Conversations");
         }
         public async Task<Conversation> GetConversationAsync(string userA, string userB)
         {
