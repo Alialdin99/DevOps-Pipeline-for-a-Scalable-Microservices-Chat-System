@@ -1,6 +1,6 @@
-﻿namespace AuthenticationService.Messaging.Events
+﻿namespace NotificationService.Events
 {
-    public class UserRegistered
+    public class UserRegisteredEvent
     {
         public string UserId { get; set; }
         public string Email { get; set; }

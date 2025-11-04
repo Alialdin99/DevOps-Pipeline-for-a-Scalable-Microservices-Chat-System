@@ -1,4 +1,4 @@
-﻿using Shared.Events;
+﻿using ChattingService.Event;
 using ChattingService.Models;
 using ChattingService.Repositories;
 using MassTransit;

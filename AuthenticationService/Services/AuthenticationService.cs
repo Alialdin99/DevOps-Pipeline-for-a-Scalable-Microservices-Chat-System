@@ -41,7 +41,7 @@ namespace AuthenticationService.Services
             await _userRepository.CreateAsync(user);
 
             // Publish "UserRegistered" event to RabbitMQ
-            await _publishEndpoint.Publish(new UserRegistered
+            await _publishEndpoint.Publish(new UserRegisteredEvent
             {
                 UserId = user.Id,
                 Email = user.Email,
