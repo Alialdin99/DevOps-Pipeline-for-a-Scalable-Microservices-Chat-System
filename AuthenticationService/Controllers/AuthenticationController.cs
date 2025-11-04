@@ -17,9 +17,27 @@ namespace AuthenticationService.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            var token = await _authService.RegisterAsync(request.Username, request.Email, request.Password);
-            return Ok(new { Token = token });
+            try
+            {
+                var token = await _authService.RegisterAsync(request.Username, request.Email, request.Password);
+                return Ok(new { Token = token });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+               
+                Console.WriteLine($"[Register] Error: {ex.Message}");
+                return StatusCode(500, new { message = "An unexpected error occurred. Please try again later." });
+            }
         }
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)

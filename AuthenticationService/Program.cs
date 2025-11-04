@@ -1,7 +1,7 @@
+using AuthenticationService.Consumers;
+using AuthenticationService.Repositories;
 using AuthenticationService.Repositories;
 using AuthenticationService.Services;
-using AuthenticationService.Messaging.Events;
-using AuthenticationService.Repositories;
 using AuthenticationService.Services;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,13 +30,33 @@ builder.Services.AddScoped<AuthService, AuthenticationService.Services.AuthServi
 // ===== MassTransit (RabbitMQ) =====
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<UserUpdatedConsumer>();
+    x.AddConsumer<UserDeletedConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host("localhost", "/", h =>
+        cfg.Host("localhost", 56988, "/", h =>
         {
             h.Username("guest");
             h.Password("guest");
         });
+        cfg.ReceiveEndpoint("auth-service-user-updated", e =>
+        {
+            e.ConfigureConsumer<AuthenticationService.Consumers.UserUpdatedConsumer>(context);
+        });
+        cfg.ReceiveEndpoint("auth-user-deleted-queue", e =>
+        {
+            e.ConfigureConsumer<UserDeletedConsumer>(context);
+        });
+    });
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
@@ -67,5 +87,6 @@ if (app.Environment.IsDevelopment())
 }
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("AllowAll");
 app.MapControllers();
 app.Run();
