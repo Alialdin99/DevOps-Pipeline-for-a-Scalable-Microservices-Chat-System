@@ -1,0 +1,24 @@
+# Use full SDK image (includes build tools)
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+WORKDIR /app
+
+# Copy only the project files first to cache dependencies
+COPY AuthenticationService/AuthenticationService.csproj AuthenticationService/
+COPY Shared/Shared.csproj Shared/
+RUN dotnet restore AuthenticationService/AuthenticationService.csproj
+
+# Copy the full source code
+COPY . .
+
+# Move to your project directory
+WORKDIR /app/AuthenticationService
+
+# Expose the port for Swagger / API
+EXPOSE 80
+
+# Environment variables
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ASPNETCORE_URLS=http://+:80
+
+# Run the app in watch mode (auto rebuild on code changes)
+CMD ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:80"]
