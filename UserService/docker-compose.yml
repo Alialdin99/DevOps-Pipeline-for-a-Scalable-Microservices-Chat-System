@@ -1,0 +1,47 @@
+services:
+  userservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+       ASPNETCORE_ENVIRONMENT: Development
+       ConnectionStrings__MongoDb: "mongodb://mongo:27017"
+       RabbitMq__Host: "rabbitmq"
+    depends_on:
+     - rabbitmq
+     - mongo
+      
+    ports:
+      - "5000:80"
+    networks:
+      - user
+
+  mongo:
+    image: mongo:7.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - user
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      - RabbitMQ_HOST=rabbitmq
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"     # AMQP port
+      - "15672:15672"   # RabbitMQ Management UI
+    networks:
+      - user
+
+networks:
+  user:
+    driver: bridge
+
+volumes:
+  mongo_data:
