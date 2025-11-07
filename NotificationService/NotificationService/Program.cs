@@ -27,27 +27,30 @@ builder.Services.AddSignalR();
 // Register your EmailService
 builder.Services.AddSingleton<EmailService>();
 
+// ✅ Define this BEFORE configuring MassTransit
+var rabbitMqConnection = builder.Configuration.GetConnectionString("RabbitMq"); 
+
 //Configure MassTransit with RabbitMQ
 builder.Services.AddMassTransit(x =>
 {
-    // register consumers
     x.AddConsumer<UserRegisteredConsumer>();
     x.AddConsumer<MessageSentConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host("rabbitmq", "/", h =>
+        cfg.Host(new Uri(rabbitMqConnection), h =>
         {
             h.Username("guest");
             h.Password("guest");
         });
 
-        // set up a queue for this microservice
         cfg.ReceiveEndpoint("notification-service", e =>
         {
             e.ConfigureConsumer<UserRegisteredConsumer>(context);
             e.ConfigureConsumer<MessageSentConsumer>(context);
         });
+
+        cfg.UseRetry(r => r.Interval(5, TimeSpan.FromSeconds(5)));
     });
 });
 
