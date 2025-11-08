@@ -37,6 +37,16 @@ builder.Services.AddMassTransit(x =>
 
 builder.Services.AddMassTransitHostedService();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -49,6 +59,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 app.UseAuthorization();
+app.UseCors("AllowAll");
 
 app.MapControllers();
 app.MapHub<ChatHub>("/chathub");
