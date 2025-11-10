@@ -1,7 +1,7 @@
-// Microservice URLs
-const AUTH_SERVICE_URL = 'http://localhost:5234/api';
-const USER_SERVICE_URL = 'http://localhost:5297/api';
-const CHAT_SERVICE_URL = 'http://localhost:7191/api';
+// Microservice URLs (inside Docker network)
+const AUTH_SERVICE_URL = 'http://authentication:80/api';
+const USER_SERVICE_URL = 'http://userservice:80/api';
+const CHAT_SERVICE_URL = 'http://chatting:80/api';
 
 interface FetchOptions extends RequestInit {
   skipAuth?: boolean;
@@ -18,7 +18,6 @@ const getBaseUrl = (endpoint: string): string => {
   } else if (endpoint.startsWith('/Chat')) {
     return CHAT_SERVICE_URL;
   }
-  // Default to auth service
   return AUTH_SERVICE_URL;
 };
 
@@ -39,18 +38,20 @@ export const apiRequest = async (
     },
   };
 
-  // Add auth token to all requests unless skipAuth is true
   if (!skipAuth) {
     const token = localStorage.getItem('authToken');
     if (token) {
       config.headers = {
         ...config.headers,
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       };
     }
   }
 
-  const url = endpoint.startsWith('http') ? endpoint : `${getBaseUrl(endpoint)}${endpoint}`;
+  const url = endpoint.startsWith('http')
+    ? endpoint
+    : `${getBaseUrl(endpoint)}${endpoint}`;
+
   return fetch(url, config);
 };
 
@@ -59,7 +60,6 @@ export const apiRequest = async (
  */
 export const handleApiResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
-    // Try to parse error message from response
     try {
       const error = await response.json();
       throw new Error(error.message || 'An error occurred');
@@ -68,7 +68,6 @@ export const handleApiResponse = async <T>(response: Response): Promise<T> => {
     }
   }
 
-  // Handle empty responses
   const text = await response.text();
   if (!text) return null as T;
 
@@ -82,12 +81,15 @@ export const handleApiResponse = async <T>(response: Response): Promise<T> => {
 /**
  * Get user info from token
  */
-export const getCurrentUser = (): { id: string; username: string; email: string } | null => {
+export const getCurrentUser = (): {
+  id: string;
+  username: string;
+  email: string;
+} | null => {
   const token = localStorage.getItem('authToken');
   if (!token) return null;
 
   try {
-    // Decode JWT token to get user info
     const payload = token.split('.')[1];
     const decoded = JSON.parse(atob(payload));
     return {
