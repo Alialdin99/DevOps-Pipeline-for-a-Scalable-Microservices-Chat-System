@@ -16,4 +16,4 @@ EXPOSE 5173
 
 # Run the Vite dev server
 CMD ["npm", "run", "dev", "--", "--host"]
-docker build -t react-app .
+# docker build -t react-app .
