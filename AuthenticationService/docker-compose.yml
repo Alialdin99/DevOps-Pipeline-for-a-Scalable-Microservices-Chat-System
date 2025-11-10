@@ -1,0 +1,51 @@
+version: "3.9"
+services:
+  authentication:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+       ASPNETCORE_ENVIRONMENT: "Development"
+       ConnectionStrings__MongoDb: "mongodb://admin:admin@mongodb:27017"
+       ConnectionStrings__RabbitMq: "amqp://guest:guest@rabbitmq:5672"
+       Jwt__Key: "this-is-a-very-secret-key-123456789"
+    depends_on:
+     - rabbitmq
+     - mongo
+      
+    ports:
+      - "5000:80"
+    networks:
+      - chatnet
+
+  mongo:
+    image: mongo:7.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - chatnet
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      - RabbitMQ_HOST=rabbitmq
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"     # AMQP port
+      - "15672:15672"   # RabbitMQ Management UI
+    networks:
+      - chatnet
+
+networks:
+  chatnet:
+
+volumes:
+  mongo_data:

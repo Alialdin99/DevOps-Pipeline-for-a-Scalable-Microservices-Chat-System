@@ -1,0 +1,50 @@
+services:
+  chattingapp:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__MongoDb: mongodb://mongodb:27017
+      ConnectionStrings__RabbitMq: amqp://guest:guest@rabbitmq:5672
+      DatabaseName: ChatDb
+
+    depends_on:
+      - mongodb
+      - rabbitmq
+
+    networks:
+      - Chatting
+
+  mongodb:
+    image: mongo:7.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - Chatting
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+    networks:
+      - Chatting
+
+networks:
+  Chatting:
+    driver: bridge
+
+volumes:
+  mongo_data:

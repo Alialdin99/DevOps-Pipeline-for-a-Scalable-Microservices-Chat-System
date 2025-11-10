@@ -1,0 +1,41 @@
+services:
+  notification-service:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      RabbitMq__Host: "rabbitmq"
+      RabbitMq__Username: "guest"
+      RabbitMq__Password: "guest"
+      Email__From: "alialdin.mohamad@gmail.com"
+      Email__SmtpServer: "smtp.gmail.com"
+      Email__Port: "465"
+      Email__Username: "alialdin.mohamad@gmail.com"
+      Email__Password: "${EMAIL_PASSWORD}" # use .env file for secrets
+
+    depends_on:
+      - rabbitmq
+
+    networks:
+      - notification
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+    networks:
+      - notification
+
+networks:
+  notification:
+    driver: bridge

@@ -1,0 +1,114 @@
+version: "3.9"
+
+services:
+  # ========== Authentication Service ==========
+  authentication:
+    build:
+      context: ./AuthenticationService
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__MongoDb: "mongodb://admin:admin@mongo:27017"
+      ConnectionStrings__RabbitMq: "amqp://guest:guest@rabbitmq:5672"
+      Jwt__Key: "this-is-a-very-secret-key-123456789"
+    depends_on:
+      - mongo
+      - rabbitmq
+    ports:
+      - "5000:80"
+    networks:
+      - chatnet
+
+  # ========== User Service ==========
+  userservice:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__MongoDb: "mongodb://admin:admin@mongo:27017"
+      ConnectionStrings__RabbitMq: "amqp://guest:guest@rabbitmq:5672"
+      AuthenticationService__Url: "http://authentication:80"
+    depends_on:
+      - mongo
+      - rabbitmq
+      - authentication
+    ports:
+      - "5001:80"
+    networks:
+      - chatnet
+
+  # ========== Chatting Service ==========
+  chatting:
+    build:
+      context: ./ChattingService/ChattingService
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__RabbitMq: "amqp://guest:guest@rabbitmq:5672"
+      AuthenticationService__Url: "http://authentication:80"
+      UserService__Url: "http://userservice:80"
+    depends_on:
+      - rabbitmq
+      - authentication
+      - userservice
+    ports:
+      - "5002:80"
+    networks:
+      - chatnet
+
+  # ========== Notification Service ==========
+  notification:
+    build:
+      context: ./NotificationService/NotificationService
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__RabbitMq: "amqp://guest:guest@rabbitmq:5672"
+      AuthenticationService__Url: "http://authentication:80"
+      UserService__Url: "http://userservice:80"
+      ChattingService__Url: "http://chatting:80"
+    depends_on:
+      - rabbitmq
+      - chatting
+      - authentication
+      - userservice
+    ports:
+      - "5003:80"
+    networks:
+      - chatnet
+
+  # ========== MongoDB ==========
+  mongo:
+    image: mongo:7.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - chatnet
+
+  # ========== RabbitMQ ==========
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Management UI
+    networks:
+      - chatnet
+
+# Shared network
+networks:
+  chatnet:
+
+# Persistent Mongo volume
+volumes:
+  mongo_data:
