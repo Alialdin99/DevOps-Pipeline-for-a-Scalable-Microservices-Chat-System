@@ -20,4 +20,4 @@ jobs:
       - run: docker push moka12/authentication
       - run: docker push moka12/user
       - run: docker push moka12/chatting
-      - run: docker push moka12/notificationq
+      - run: docker push moka12/notification
