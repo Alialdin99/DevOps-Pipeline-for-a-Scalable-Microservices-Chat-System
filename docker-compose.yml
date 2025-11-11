@@ -19,8 +19,6 @@ services:
     networks:
       - chatnet
 
-
-
   # ========== User Service ==========
   userservice:
     build:
@@ -80,16 +78,24 @@ services:
     networks:
       - chatnet
 
+  # ========== Frontend (React/Vite) ==========
   frontend:
     build:
       context: ./ChatApp-FE/chime-together-app
       dockerfile: Dockerfile
     ports:
       - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - VITE_AUTH_SERVICE_URL=http://localhost:5000
+      - VITE_USER_SERVICE_URL=http://localhost:5001
+      - VITE_CHAT_SERVICE_URL=http://localhost:5002
+      - VITE_NOTIFICATION_SERVICE_URL=http://localhost:5003
     depends_on:
       - authentication
       - userservice
       - chatting
+      - notification
     networks:
       - chatnet
 
