@@ -64,27 +64,30 @@ jobs:
           username: ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}
           password: ${{ secrets.AYMAN_DOCKERHUB_TOKEN }}
 
-      # # -------------------------
-      # # 5. Build & Push All Images
-      # # -------------------------
-      # - name: Build and Push Docker Images
-      #   run: |
-      #     # Frontend
-      #     docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chatapp-fe:latest ./ChatApp-FE/chime-together-app
-      #     docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chatapp-fe:latest
+      # -------------------------
+      # 5. Build & Push All Images
+      # -------------------------
+      - name: Build and Push Docker Images
+        run: |
+          # Frontend
+          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chatapp-fe:latest ./ChatApp-FE/chime-together-app
+          docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chatapp-fe:latest
 
-      #     # Backend Microservices
-      #     docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/auth-service:latest ./AuthenticationService
-      #     docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/auth-service:latest
+          # Backend Microservices
+          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/auth-service:latest ./AuthenticationService
+          docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/auth-service:latest
 
-      #     docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chat-service:latest ./ChattingService
-      #     docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chat-service:latest
+          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chat-service:latest \
+            -f ./ChattingService/ChattingService/Dockerfile \
+            ./ChattingService/ChattingService
+          docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chat-service:latest
 
-      #     docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest ./NotificationService
-      #     docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest
 
-      #     docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/user-service:latest ./UserService
-      #     docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/user-service:latest
+          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest ./NotificationService
+          docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest
+
+          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/user-service:latest ./UserService
+          docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/user-service:latest
 
       # -------------------------
       # 6. Deploy to Local Server
