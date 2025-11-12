@@ -4,7 +4,7 @@ WORKDIR /src
 
 # copy csproj and restore
 COPY AuthenticationService/AuthenticationService.csproj AuthenticationService/
-COPY Shared/Shared.csproj Shared/
+
 RUN dotnet restore AuthenticationService/AuthenticationService.csproj
 
 # copy all source and build
