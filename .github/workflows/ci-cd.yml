@@ -65,7 +65,7 @@ jobs:
           password: ${{ secrets.AYMAN_DOCKERHUB_TOKEN }}
 
       # -------------------------
-      # 5. Build & Push All Images
+      # 5. Build & Push All Images (CORRECTED)
       # -------------------------
       - name: Build and Push Docker Images
         run: |
@@ -79,13 +79,12 @@ jobs:
 
           docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chat-service:latest \
             -f ./ChattingService/ChattingService/Dockerfile \
-            ./ChattingService/ChattingService
+            ./ChattingService
           docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chat-service:latest
 
-
-          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest ./NotificationService
+          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest \
             -f ./NotificationService/NotificationService/Dockerfile \
-            ./NotificationService/NotificationService
+            ./NotificationService
           docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest
 
           docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/user-service:latest ./UserService
