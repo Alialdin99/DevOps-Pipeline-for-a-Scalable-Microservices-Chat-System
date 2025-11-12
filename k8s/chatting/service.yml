@@ -1,1 +1,13 @@
-
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatting
+spec:
+  selector:
+    app: chatting
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30001   # external access if needed
+  type: NodePort        # use ClusterIP if you don’t need external access
