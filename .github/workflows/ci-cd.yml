@@ -73,18 +73,17 @@ jobs:
         docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chatapp-fe:latest ./ChatApp-FE/chime-together-app
         docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chatapp-fe:latest
 
-        # Backend Microservices
-        docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/auth-service:latest ./AuthenticationService
-        docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/auth-service:latest
+        - run: echo ${{ secrets.AYMAN_DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.AYMAN_DOCKERHUB_USERNAME }} --password-stdin
+        - run: docker build -t moka12/authentication ./AuthenticationService
+        - run: docker build -t moka12/user ./UserService
+        - run: docker build -t moka12/chatting ./ChattingService/ChattingService
+        - run: docker build -t moka12/notification ./NotificationService/NotificationService
 
-        docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chat-service:latest ./ChattingService/chattingService
-        docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chat-service:latest
+        - run: docker push moka12/authentication
+        - run: docker push moka12/user
+        - run: docker push moka12/chatting
+        - run: docker push moka12/notification
 
-        docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest ./NotificationService/NotificationService
-        docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest
-
-        docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/user-service:latest ./UserService
-        docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/user-service:latest
 
     # -------------------------
     # 6. Deploy to Local Server
