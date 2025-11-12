@@ -84,6 +84,8 @@ jobs:
 
 
           docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest ./NotificationService
+            -f ./NotificationService/NotificationService/Dockerfile \
+            ./NotificationService/NotificationService
           docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest
 
           docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/user-service:latest ./UserService
