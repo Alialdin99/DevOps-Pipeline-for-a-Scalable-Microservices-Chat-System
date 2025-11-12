@@ -43,14 +43,17 @@ jobs:
 
     - name: Restore and Build Backend Services
       run: |
-        dotnet restore ./AuthenticationService
-        dotnet build ./AuthenticationService --no-restore --configuration Release
-        dotnet restore ./ChattingService
-        dotnet build ./ChattingService --no-restore --configuration Release
-        dotnet restore ./NotificationService
-        dotnet build ./NotificationService --no-restore --configuration Release
-        dotnet restore ./UserService
-        dotnet build ./UserService --no-restore --configuration Release
+        dotnet restore ./AuthenticationService/AuthenticationService.sln
+        dotnet build ./AuthenticationService/AuthenticationService.sln --no-restore --configuration Release
+
+        dotnet restore ./ChattingService/ChattingService.sln
+        dotnet build ./ChattingService/ChattingService.sln --no-restore --configuration Release
+
+        dotnet restore ./NotificationService/NotificationService.sln
+        dotnet build ./NotificationService/NotificationService.sln --no-restore --configuration Release
+
+        dotnet restore ./UserService/UserService.sln
+        dotnet build ./UserService/UserService.sln --no-restore --configuration Release
 
     # -------------------------
     # 4. Login to Docker Hub
