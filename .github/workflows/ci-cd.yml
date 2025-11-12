@@ -74,9 +74,11 @@ jobs:
           docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chatapp-fe:latest ./ChatApp-FE/chime-together-app
           docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chatapp-fe:latest
 
-          # Backend Microservices with better error handling
+          # Backend Microservices with correct paths
           echo "Building Auth Service..."
-          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/auth-service:latest ./AuthenticationService
+          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/auth-service:latest \
+            -f ./AuthenticationService/AuthenticationService/Dockerfile \
+            ./AuthenticationService
           docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/auth-service:latest
 
           echo "Building Chat Service..."
@@ -92,9 +94,10 @@ jobs:
           docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest
 
           echo "Building User Service..."
-          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/user-service:latest ./UserService
+          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/user-service:latest \
+            -f ./UserService/UserService/Dockerfile \
+            ./UserService
           docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/user-service:latest
-
       # -------------------------
       # 6. Deploy to Local Server
       # -------------------------
