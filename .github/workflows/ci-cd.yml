@@ -77,7 +77,7 @@ jobs:
           docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/auth-service:latest ./AuthenticationService
           docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/auth-service:latest
 
-          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chat-service:latest ./ChattingService
+          docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chat-service:latest ./ChattingService/ChattingService
           docker push ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/chat-service:latest
 
           docker build -t ${{ secrets.AYMAN_DOCKERHUB_USERNAME }}/notify-service:latest ./NotificationService
