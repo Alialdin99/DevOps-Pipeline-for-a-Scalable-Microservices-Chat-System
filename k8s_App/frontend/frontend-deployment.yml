@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: chat-app
+
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend-container
+        image: moka12/frontend
+        ports:
+        - containerPort: 5173
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: VITE_AUTH_SERVICE_URL
+          value: "http://authentication:80"
+        - name: VITE_USER_SERVICE_URL
+          value: "http://userservice:80"
+        - name: VITE_CHAT_SERVICE_URL
+          value: "http://chatting:80"
+        - name: VITE_NOTIFICATION_SERVICE_URL
+          value: "http://notification:80"
