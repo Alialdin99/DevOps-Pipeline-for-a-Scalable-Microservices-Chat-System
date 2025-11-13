@@ -16,8 +16,10 @@ jobs:
       - run: docker build -t moka12/user ./UserService
       - run: docker build -t moka12/chatting ./ChattingService/ChattingService
       - run: docker build -t moka12/notification ./NotificationService/NotificationService
+      - run: docker build -t moka12/frontend ./ChatApp-FE/chime-together-app
 
       - run: docker push moka12/authentication
       - run: docker push moka12/user
       - run: docker push moka12/chatting
       - run: docker push moka12/notification
+      - run: docker push moka12/frontend
