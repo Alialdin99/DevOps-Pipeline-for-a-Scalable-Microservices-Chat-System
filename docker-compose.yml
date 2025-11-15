@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
-      ConnectionStrings__MongoDb: "mongodb://admin:admin@mongo:27017"
+      ConnectionStrings__MongoDb: "mongodb://admin:admin@mongo:27017/AuthDb?authSource=admin"
       ConnectionStrings__RabbitMq: "amqp://guest:guest@rabbitmq:5672"
       Jwt__Key: "this-is-a-very-secret-key-123456789"
     depends_on:
@@ -26,7 +26,7 @@ services:
       dockerfile: Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
-      ConnectionStrings__MongoDb: "mongodb://admin:admin@mongo:27017"
+      ConnectionStrings__MongoDb: "mongodb://admin:admin@mongo:27017/UserDb?authSource=admin"
       ConnectionStrings__RabbitMq: "amqp://guest:guest@rabbitmq:5672"
       AuthenticationService__Url: "http://authentication:80"
     depends_on:
@@ -45,6 +45,7 @@ services:
       dockerfile: Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__MongoDb: "mongodb://admin:admin@mongo:27017/ChatDb?authSource=admin"
       ConnectionStrings__RabbitMq: "amqp://guest:guest@rabbitmq:5672"
       AuthenticationService__Url: "http://authentication:80"
       UserService__Url: "http://userservice:80"

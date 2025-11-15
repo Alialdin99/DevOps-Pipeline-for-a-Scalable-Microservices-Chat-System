@@ -9,10 +9,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddSingleton<IMongoClient>(sp =>
-    new MongoClient(builder.Configuration.GetConnectionString("MongoDb")));
+{
+    var conn = builder.Configuration.GetConnectionString("MongoDb");
+    return new MongoClient(conn);
+});
 
 builder.Services.AddSingleton(sp =>
-    sp.GetRequiredService<IMongoClient>().GetDatabase("UserDb"));
+{
+    var conn = builder.Configuration.GetConnectionString("MongoDb");
+    var mongoUrl = new MongoUrl(conn);
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.GetDatabase(mongoUrl.DatabaseName);
+}); ;
 
 
 builder.Services.AddScoped<UserRepository>();

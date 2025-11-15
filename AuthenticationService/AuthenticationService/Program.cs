@@ -14,14 +14,16 @@ var builder = WebApplication.CreateBuilder(args);
 // ===== MongoDB =====
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("MongoDb");
-    return new MongoClient(connectionString);
+    var conn = builder.Configuration.GetConnectionString("MongoDb");
+    return new MongoClient(conn);
 });
 
 builder.Services.AddSingleton(sp =>
 {
+    var conn = builder.Configuration.GetConnectionString("MongoDb");
+    var mongoUrl = new MongoUrl(conn);
     var client = sp.GetRequiredService<IMongoClient>();
-    return client.GetDatabase("AuthDb");
+    return client.GetDatabase(mongoUrl.DatabaseName);
 });
 
 builder.Services.AddScoped<UserRepository, UserRepository>();

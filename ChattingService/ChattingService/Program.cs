@@ -12,11 +12,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //MongoDB setup
-builder.Services.AddSingleton<IMongoDatabase>(sp =>
+builder.Services.AddSingleton<IMongoClient>(sp =>
 {
-    var config = sp.GetRequiredService<IConfiguration>();
-    var client = new MongoClient(config.GetConnectionString("MongoDb"));
-    return client.GetDatabase("ChatDb");
+    var conn = builder.Configuration.GetConnectionString("MongoDb");
+    return new MongoClient(conn);
+});
+
+builder.Services.AddSingleton(sp =>
+{
+    var conn = builder.Configuration.GetConnectionString("MongoDb");
+    var mongoUrl = new MongoUrl(conn);
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.GetDatabase(mongoUrl.DatabaseName);
 });
 
 
