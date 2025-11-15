@@ -1,0 +1,26 @@
+name: chat-app CI
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo ${{ secrets.AYMAN_DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.AYMAN_DOCKERHUB_USERNAME }} --password-stdin
+      
+      # Build Backend Services
+      - run: docker build -t moka12/authentication ./AuthenticationService
+      - run: docker build -t moka12/user ./UserService
+      - run: docker build -t moka12/chatting ./ChattingService/ChattingService
+      - run: docker build -t moka12/notification ./NotificationService/NotificationService
+      
+       # Build Frontend (React/Vite)
+      - run: docker build -t moka12/frontend ./ChatApp-FE/chime-together-app
+      # Run frontend tests
+      - name: Run Frontend Tests
+        run: |
+          docker run -e CI=true moka12/frontend npm run test
