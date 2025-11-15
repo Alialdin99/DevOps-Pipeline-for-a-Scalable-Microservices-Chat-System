@@ -62,6 +62,16 @@ namespace UserService.Services.ConcreteServices
         {
             try
             {
+                // Check if user already exists by AuthUserId
+                var existing = await _repo.GetByAuthUserIdAsync(profile.AuthUserId);
+                if (existing != null)
+                {
+                    _logger.LogInformation("User profile already exists for AuthUserId: {AuthUserId}, Email: {Email}", 
+                        profile.AuthUserId, profile.Email);
+                    return;
+                }
+
+                // User doesn't exist, create it
                 await _repo.CreateAsync(profile);
                 _logger.LogInformation("User profile created for {Email}", profile.Email);
             }
