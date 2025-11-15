@@ -52,6 +52,8 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddMassTransitHostedService();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>

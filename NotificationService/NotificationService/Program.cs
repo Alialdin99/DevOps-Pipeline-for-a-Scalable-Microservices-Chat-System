@@ -1,6 +1,8 @@
 using MassTransit;
+using MongoDB.Driver;
 using NotificationService.Consumers; // where your consumers live
 using NotificationService.Hubs;
+using NotificationService.Repositories;
 using NotificationService.Services; // your EmailService + NotificationHub
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +11,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// MongoDB setup
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    var conn = builder.Configuration.GetConnectionString("MongoDb");
+    return new MongoClient(conn);
+});
+
+builder.Services.AddSingleton(sp =>
+{
+    var conn = builder.Configuration.GetConnectionString("MongoDb");
+    var mongoUrl = new MongoUrl(conn);
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.GetDatabase(mongoUrl.DatabaseName);
+});
+
+builder.Services.AddScoped<NotificationRepository>();
 
 // Enable CORS for frontend connections
 builder.Services.AddCors(options =>
@@ -53,6 +72,8 @@ builder.Services.AddMassTransit(x =>
         cfg.UseRetry(r => r.Interval(5, TimeSpan.FromSeconds(5)));
     });
 });
+
+builder.Services.AddMassTransitHostedService();
 
 var app = builder.Build();
 

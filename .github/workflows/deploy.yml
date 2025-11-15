@@ -23,4 +23,3 @@ jobs:
       - run: docker push moka12/chatting
       - run: docker push moka12/notification
       - run: docker push moka12/frontend
-      # upload images to docker hub

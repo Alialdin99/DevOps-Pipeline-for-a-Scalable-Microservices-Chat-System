@@ -4,6 +4,11 @@ const USER_SERVICE_URL = import.meta.env.VITE_USER_SERVICE_URL || 'http://localh
 const CHAT_SERVICE_URL = import.meta.env.VITE_CHAT_SERVICE_URL || 'http://localhost:5002';
 const NOTIFICATION_SERVICE_URL = import.meta.env.VITE_NOTIFICATION_SERVICE_URL || 'http://localhost:5003';
 
+// const AUTH_SERVICE_URL = 'http://localhost:80';
+// const USER_SERVICE_URL = import.meta.env.VITE_USER_SERVICE_URL || 'http://localhost:80';
+// const CHAT_SERVICE_URL = import.meta.env.VITE_CHAT_SERVICE_URL || 'http://localhost:80';
+// const NOTIFICATION_SERVICE_URL = import.meta.env.VITE_NOTIFICATION_SERVICE_URL || 'http://localhost:80';
+
 interface FetchOptions extends RequestInit {
   skipAuth?: boolean;
 }
