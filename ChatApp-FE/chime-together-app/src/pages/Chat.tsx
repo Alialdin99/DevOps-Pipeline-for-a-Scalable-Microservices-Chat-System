@@ -8,6 +8,7 @@ import { apiRequest, handleApiResponse, getCurrentUser } from "@/lib/api";
 
 interface User {
   id: string;
+  authUserId?: string;
   username: string;
   email: string;
 }
@@ -15,8 +16,11 @@ interface User {
 interface Notification {
   id: string;
   fromUser: string;
+  senderId?: string;
   message: string;
   timestamp: Date;
+  receiverId?: string;
+  read?: boolean;
 }
 
 const Chat = () => {
@@ -104,11 +108,28 @@ const Chat = () => {
       const response = await apiRequest('/Users');
       const data = await handleApiResponse<User[]>(response);
       
+      if (!data || !Array.isArray(data)) {
+        console.error('Invalid users data:', data);
+        toast({ 
+          title: "Invalid response from server", 
+          variant: "destructive"
+        });
+        return;
+      }
+      
       // Find current user in the list
       const user = getCurrentUser();
-      const current = data.find(u => u.username.toLowerCase() === user?.username.toLowerCase());
-      if (current) {
-        setCurrentUser(current);
+      if (user) {
+        const current = data.find(u => 
+          u.username.toLowerCase() === user.username.toLowerCase() ||
+          u.authUserId === user.id
+        );
+        if (current) {
+          setCurrentUser(current);
+          console.log('Current user set:', current);
+        } else {
+          console.warn('Current user not found in users list', { user, users: data });
+        }
       }
       
       // Filter out current user from the list
@@ -119,6 +140,7 @@ const Chat = () => {
       setUsers(data);
       setFilteredUsers(filtered);
     } catch (error) {
+      console.error('Error fetching users:', error);
       toast({ 
         title: "Unable to load users", 
         description: "Please check your connection and try again.",
@@ -152,13 +174,37 @@ const Chat = () => {
 
   const fetchNotifications = async () => {
     try {
-      // Your friend will implement this endpoint
-      const response = await apiRequest('/Notifications');
+      const user = getCurrentUser();
+      if (!user?.id) {
+        return;
+      }
+
+      // Get current user profile to use UserProfile.Id
+      const currentUserProfile = currentUser || users.find(u => 
+        u.username.toLowerCase() === user.username.toLowerCase() ||
+        u.authUserId === user.id
+      );
+
+      if (!currentUserProfile?.id) {
+        return;
+      }
+
+      const response = await apiRequest(`/Notifications?receiverId=${encodeURIComponent(currentUserProfile.id)}`);
       const data = await handleApiResponse<Notification[]>(response);
-      setNotifications(data || []);
+      
+      // Map notifications to include username
+      const notificationsWithUsername = (data || []).map(notification => {
+        const sender = users.find(u => u.id === notification.fromUser || u.id === notification.senderId);
+        return {
+          ...notification,
+          fromUser: sender?.username || notification.fromUser || 'Unknown'
+        };
+      });
+      
+      setNotifications(notificationsWithUsername);
     } catch (error) {
       // Silent fail - notifications are not critical
-      console.log('Could not fetch notifications');
+      console.log('Could not fetch notifications:', error);
     }
   };
 
@@ -186,6 +232,18 @@ const Chat = () => {
 
   const sendMessage = async () => {
     if (!message.trim() || !selectedUser || !currentUser) {
+      if (!message.trim()) {
+        toast({ title: "Please enter a message", variant: "destructive" });
+      }
+      return;
+    }
+
+    if (!currentUser.id || !selectedUser.id) {
+      toast({ 
+        title: "User information is missing", 
+        description: "Please refresh the page and try again.",
+        variant: "destructive" 
+      });
       return;
     }
 
@@ -206,6 +264,7 @@ const Chat = () => {
       toast({ title: "Message sent!" });
       setMessage(""); // Clear message after sending
     } catch (error) {
+      console.error('Send message error:', error);
       toast({
         title: "Failed to send message",
         description: error instanceof Error ? error.message : "Unable to send message. Please try again.",
@@ -405,7 +464,7 @@ const Chat = () => {
                   className="flex-1"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyPress}
                   disabled={isSending}
                 />
                 <Button 
