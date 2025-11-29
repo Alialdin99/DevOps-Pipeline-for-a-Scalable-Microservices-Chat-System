@@ -1,9 +1,10 @@
 using MassTransit;
 using MongoDB.Driver;
-using NotificationService.Consumers; // where your consumers live
+using NotificationService.Consumers;
 using NotificationService.Hubs;
 using NotificationService.Repositories;
-using NotificationService.Services; // your EmailService + NotificationHub
+using NotificationService.Services;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,48 +37,27 @@ builder.Services.AddCors(options =>
         policy => policy
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowAnyOrigin() //  restrict in production
+            .AllowAnyOrigin() // restrict in production
     );
 });
 
 // Add SignalR for real-time notifications
 builder.Services.AddSignalR();
 
-// Register your EmailService
-builder.Services.AddSingleton<EmailService>();
-
-// ✅ Define this BEFORE configuring MassTransit
-var rabbitMqConnection = builder.Configuration.GetConnectionString("RabbitMq"); 
-
-//Configure MassTransit with RabbitMQ
+// MassTransit setup
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<UserRegisteredConsumer>();
-    x.AddConsumer<MessageSentConsumer>();
-
+    x.AddConsumer<SomeNotificationConsumer>(); // replace with actual consumers if present
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(new Uri(rabbitMqConnection), h =>
-        {
-            h.Username("guest");
-            h.Password("guest");
-        });
-
-        cfg.ReceiveEndpoint("notification-service", e =>
-        {
-            e.ConfigureConsumer<UserRegisteredConsumer>(context);
-            e.ConfigureConsumer<MessageSentConsumer>(context);
-        });
-
-        cfg.UseRetry(r => r.Interval(5, TimeSpan.FromSeconds(5)));
+        cfg.Host(builder.Configuration.GetConnectionString("RabbitMq"));
+        cfg.ConfigureEndpoints(context);
     });
 });
-
 builder.Services.AddMassTransitHostedService();
 
 var app = builder.Build();
 
-// Use Swagger in dev
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -86,14 +66,16 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+app.UseRouting();
 
 app.UseAuthorization();
+app.UseCors("AllowAll");
 
-// Map your SignalR hub
-app.MapHub<NotificationHub>("/notificationHub");
+// Prometheus metrics middleware
+app.UseHttpMetrics();
+app.MapMetrics("/metrics");
 
-// Map controllers (if you ever expose APIs)
 app.MapControllers();
+app.MapHub<NotificationHub>("/notificationhub");
 
 app.Run();
