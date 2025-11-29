@@ -1,15 +1,19 @@
 using AuthenticationService.Consumers;
 using AuthenticationService.Repositories;
-using AuthenticationService.Repositories;
-using AuthenticationService.Services;
 using AuthenticationService.Services;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
+using Prometheus;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ===== Configuration & Services =====
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // ===== MongoDB =====
 builder.Services.AddSingleton<IMongoClient>(sp =>
@@ -36,61 +40,69 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<UserDeletedConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host("rabbitmq", 5672, "/", h =>
-        {
-            h.Username("guest");
-            h.Password("guest");
-        });
-        cfg.ReceiveEndpoint("auth-service-user-updated", e =>
-        {
-            e.ConfigureConsumer<AuthenticationService.Consumers.UserUpdatedConsumer>(context);
-        });
-        cfg.ReceiveEndpoint("auth-user-deleted-queue", e =>
-        {
-            e.ConfigureConsumer<UserDeletedConsumer>(context);
-        });
+        cfg.Host(builder.Configuration.GetConnectionString("RabbitMq"));
+        cfg.ConfigureEndpoints(context);
     });
 });
-
 builder.Services.AddMassTransitHostedService();
 
-builder.Services.AddCors(options =>
+// ===== Authentication (JWT) =====
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var key = Encoding.ASCII.GetBytes(jwtKey ?? "ReplaceWithStrongKey");
+
+builder.Services.AddAuthentication(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+        ValidateIssuer = true,
+        ValidateAudience = false,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
 });
 
-// ===== JWT Authentication =====
-var jwtKey = builder.Configuration["Jwt:Key"];
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
-        };
-    });
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// ===== CORS =====
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowAnyOrigin()
+    );
+});
 
 var app = builder.Build();
+
+// ===== HTTP pipeline =====
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseCors("AllowAll");
+
+// Prometheus metrics middleware: collects HTTP metrics and exposes /metrics
+app.UseHttpMetrics();           // collect default HTTP metrics (latency, request count, etc.)
+app.MapMetrics("/metrics");     // expose metrics endpoint
+
 app.MapControllers();
+
 app.Run();
