@@ -1,9 +1,9 @@
 using ChattingService.Hubs;
 using ChattingService.Repositories;
-using ChattingService.Repositories;
 using ChattingService.Services;
 using MassTransit;
 using MongoDB.Driver;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//MongoDB setup
+// MongoDB setup
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
     var conn = builder.Configuration.GetConnectionString("MongoDb");
@@ -26,14 +26,13 @@ builder.Services.AddSingleton(sp =>
     return client.GetDatabase(mongoUrl.DatabaseName);
 });
 
-
 builder.Services.AddScoped<ChatRepository>();
 builder.Services.AddScoped<ChatService>();
 
-//SignalR setup
+// SignalR setup
 builder.Services.AddSignalR();
 
-//MassTransit setup (RabbitMQ)
+// MassTransit setup (RabbitMQ)
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
@@ -41,7 +40,6 @@ builder.Services.AddMassTransit(x =>
         cfg.Host(builder.Configuration.GetConnectionString("RabbitMq"));
     });
 });
-
 builder.Services.AddMassTransitHostedService();
 
 builder.Services.AddCors(options =>
@@ -65,8 +63,13 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
 app.UseAuthorization();
 app.UseCors("AllowAll");
+
+// Prometheus metrics middleware
+app.UseHttpMetrics();
+app.MapMetrics("/metrics");
 
 app.MapControllers();
 app.MapHub<ChatHub>("/chathub");
