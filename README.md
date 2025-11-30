@@ -13,9 +13,64 @@
 
 ---
 
-This project demonstrates a **complete DevOps pipeline** for a **microservices-based real-time chat application**.  
-It showcases how modern **DevOps practices** can be used to build, test, deploy, and monitor a **scalable cloud-native system** using **Docker**, **Kubernetes**, **RabbitMQ**, **GitHub Actions**, and **AWS**.
+Real-Time Chat Application – DevOps Pipeline
 
+This project showcases a complete DevOps pipeline for a microservices-based real-time chat application.
+It demonstrates how modern DevOps practices are applied to build, test, deploy, and monitor a scalable cloud-native system.
+
+🧩 Microservices Architecture
+
+The system consists of four independent microservices:
+
+🔐 Authentication Service – Handles user login, registration, and token management
+
+👤 User Service – Manages user profiles and user-related data
+
+💬 Chatting Service – Processes real-time chat operations
+
+📨 Notification Service – Sends real-time notifications and updates
+
+Each service is containerized and deployed independently for maximum scalability.
+
+🛠️ DevOps Stack
+
+This project integrates a full modern DevOps toolchain:
+
+Docker
+
+Containerization for all microservices
+
+Reproducible environments and consistent builds
+
+GitHub Actions (CI/CD)
+
+Automated build and test pipelines
+
+Push-to-deploy workflow (Docker Hub / Kubernetes)
+
+Kubernetes
+
+Deployment, scaling, and service orchestration
+
+Supports rolling updates and auto-restarts
+
+Prometheus
+
+Real-time monitoring
+
+Microservice-level metrics collection
+
+🚀 Features
+
+Microservices architecture
+
+Real-time chat functionality
+
+Automated CI/CD pipeline
+
+Containerized and cloud-native
+
+Scalable and observable system
 ---
 
 ## 🚀 Project Overview
