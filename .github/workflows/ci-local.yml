@@ -1,0 +1,77 @@
+name: Local CI (manual)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build-local:
+    runs-on: ubuntu-latest
+    name: Build images locally (no push)
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (for cross-builds)
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Authentication image (local)
+        uses: docker/build-push-action@v4
+        with:
+          context: ./AuthenticationService
+          file: ./AuthenticationService/Dockerfile
+          push: false
+          load: true
+          tags: local/authentication:latest
+
+      - name: Build User image (local)
+        uses: docker/build-push-action@v4
+        with:
+          context: ./UserService
+          file: ./UserService/Dockerfile
+          push: false
+          load: true
+          tags: local/user:latest
+
+      - name: Build Chatting image (local)
+        uses: docker/build-push-action@v4
+        with:
+          context: ./ChattingService/ChattingService
+          file: ./ChattingService/ChattingService/Dockerfile
+          push: false
+          load: true
+          tags: local/chatting:latest
+
+      - name: Build Notification image (local)
+        uses: docker/build-push-action@v4
+        with:
+          context: ./NotificationService/NotificationService
+          file: ./NotificationService/NotificationService/Dockerfile
+          push: false
+          load: true
+          tags: local/notification:latest
+
+      - name: Build frontend assets locally
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install and build frontend
+        run: |
+          cd ChatApp-FE/chime-together-app
+          npm ci
+          npm run build
+
+      - name: Build Frontend image (local)
+        uses: docker/build-push-action@v4
+        with:
+          context: ./ChatApp-FE/chime-together-app
+          file: ./ChatApp-FE/chime-together-app/Dockerfile
+          push: false
+          load: true
+          tags: local/frontend:latest
+
+      - name: List local images created
+        run: docker images | grep local || true
