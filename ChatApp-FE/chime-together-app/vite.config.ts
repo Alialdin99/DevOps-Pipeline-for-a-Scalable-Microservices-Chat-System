@@ -4,9 +4,10 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
+  base: '/', // must match the ingress path for frontend
   server: {
-    host: "0.0.0.0",   // allow external access (Docker)
-    port: 5173,        // matches Docker EXPOSE + compose port
+    host: "0.0.0.0",
+    port: 5173,
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

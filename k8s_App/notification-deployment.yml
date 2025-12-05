@@ -16,17 +16,17 @@ spec:
     spec:
       containers:
       - name: notification-container
-        image: moka12/notification
+        image: moka12/notification:latest
         ports:
         - containerPort: 80
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Development"
         - name: ConnectionStrings__RabbitMq
-          value: "amqp://guest:guest@rabbitmq:5672"
+          value: "amqp://guest:guest@rabbitmq-service:5672"
         - name: UserService__Url
-          value: "http://userservice:80"
+          value: "http://user-service-cluster-ip:80"
         - name: Authentication__Url
-          value: "http://authentication:80"
+          value: "http://authentication-service-cluster-ip:80"
         - name: ChattingService__Url
-          value: "http://chatting:80"
+          value: "http://chatting-cluster-ip:80"

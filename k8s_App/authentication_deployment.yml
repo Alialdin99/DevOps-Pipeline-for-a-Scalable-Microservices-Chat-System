@@ -1,30 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service-deployment
+  name: authentication-deployment
   namespace: chat-app
-
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: user-service
+      app: authentication
   template:
     metadata:
       labels:
-        app: user-service
+        app: authentication
     spec:
       containers:
-      - name: user-service-container
-        image: moka12/user
+      - name: authentication-container
+        image: moka12/authentication:latest
         ports:
         - containerPort: 80
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Development"
         - name: ConnectionStrings__MongoDb
-          value: "mongodb://admin:admin@mongo:27017"
+          value: "mongodb://admin:admin@mongodb-service:27017/AuthDb?authSource=admin"
         - name: ConnectionStrings__RabbitMq
-          value: "amqp://guest:guest@rabbitmq:5672"
-        - name: Authentication__Url
-          value: "http://authentication:80"
+          value: "amqp://guest:guest@rabbitmq-service:5672"
+        - name: Jwt__Key
+          value: "this-is-a-very-secret-key-123456789"

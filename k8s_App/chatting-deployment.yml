@@ -16,15 +16,17 @@ spec:
     spec:
       containers:
       - name: chatting-container
-        image: moka12/chatting
+        image: moka12/chatting:latest
         ports:
         - containerPort: 80
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Development"
+        - name: ConnectionStrings__MongoDb
+          value: "mongodb://admin:admin@mongodb-service:27017/ChatDb?authSource=admin"
         - name: ConnectionStrings__RabbitMq
-          value: "amqp://guest:guest@rabbitmq:5672"
+          value: "amqp://guest:guest@rabbitmq-service:5672"
         - name: UserService__Url
-          value: "http://userservice:80"
+          value: "http://user-service-cluster-ip:80"
         - name: Authentication__Url
-          value: "http://authentication:80"
+          value: "http://authentication-service-cluster-ip:80"

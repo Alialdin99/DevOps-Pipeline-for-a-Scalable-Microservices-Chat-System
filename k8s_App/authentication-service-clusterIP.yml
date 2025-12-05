@@ -4,10 +4,9 @@ metadata:
   name: authentication-service-cluster-ip
   namespace: chat-app
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: authentication
   ports:
   - port: 80
     targetPort: 80
-    nodePort: 30080

@@ -1,6 +1,5 @@
-
 # Use Node 20 (LTS) for React/Vite
-FROM node:20
+FROM node:20-alpine AS build
 
 # Set working directory
 WORKDIR /app
@@ -8,13 +7,13 @@ WORKDIR /app
 # Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
-
-# Copy all project files
 COPY . .
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+RUN npm run build
 
-# Expose the Vite development server port
-EXPOSE 5173
-
-# Run the Vite dev server
-CMD ["npm", "run", "dev", "--", "--host"]
-# docker build -t react-app .
+FROM nginx:alpine
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
